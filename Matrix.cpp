@@ -1,5 +1,4 @@
 ﻿#include "Matrix.h"
-#include <cmath>
 #include <cassert>
 
 using namespace std;
@@ -406,35 +405,6 @@ Vector3 Matrix::Cross(const Vector3& v1, const Vector3& v2)
 
 
 
-Matrix4x4 Matrix::Identity()
-{
-	Matrix4x4 matrix = {};
-
-	matrix.m[0][0] = 1.0f;
-	matrix.m[1][0] = 0.0f;
-	matrix.m[2][0] = 0.0f;
-	matrix.m[3][0] = 0.0f;
-
-	matrix.m[0][1] = 0.0f;
-	matrix.m[1][1] = 1.0f;
-	matrix.m[2][1] = 0.0f;
-	matrix.m[3][1] = 0.0f;
-
-	matrix.m[0][2] = 0.0f;
-	matrix.m[1][2] = 0.0f;
-	matrix.m[2][2] = 1.0f;
-	matrix.m[3][2] = 0.0f;
-
-	matrix.m[0][3] = 0.0f;
-	matrix.m[1][3] = 0.0f;
-	matrix.m[2][3] = 0.0f;
-	matrix.m[3][3] = 1.0f;
-
-	return matrix;
-}
-
-
-
 void Matrix::DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix) {
 	const float kGridHalfWidth = 2.0f; // グリッドの半分の幅
 	const uint32_t kSubdivision = 10; // 分割数
@@ -451,7 +421,7 @@ void Matrix::DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& vi
 	for (uint32_t xIndex = 0; xIndex <= kSubdivision; ++xIndex) {
 		// 上の情報を使ってワールド座標系と終点を求める
 		start[xIndex] = { (-(float)kSubdivision / 2.0f + (float)xIndex) * kGridEvery, 0.0f, -kGridHalfWidth };
-		end[xIndex]   = { (-(float)kSubdivision / 2.0f + (float)xIndex) * kGridEvery, 0.0f,  kGridHalfWidth };
+		end[xIndex] = { (-(float)kSubdivision / 2.0f + (float)xIndex) * kGridEvery, 0.0f,  kGridHalfWidth };
 
 		// スクリーン座標系まで変換をかける
 		ScreenStart[xIndex] = Transform(Transform(start[xIndex], viewProjectionMatrix), viewportMatrix);
@@ -470,7 +440,7 @@ void Matrix::DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& vi
 	for (uint32_t zIndex = 0; zIndex <= kSubdivision; ++zIndex) {
 
 		start[zIndex] = { -kGridHalfWidth,0.0f,(-(float)kSubdivision / 2.0f + (float)zIndex) * kGridEvery };
-		end[zIndex]   = { kGridHalfWidth,0.0f, (-(float)kSubdivision / 2.0f + (float)zIndex) * kGridEvery };
+		end[zIndex] = { kGridHalfWidth,0.0f, (-(float)kSubdivision / 2.0f + (float)zIndex) * kGridEvery };
 
 		// ワールド座標系からスクリーン座標系への変換
 		ScreenStart[zIndex] = Transform(Transform(start[zIndex], viewProjectionMatrix), viewportMatrix);
@@ -482,6 +452,102 @@ void Matrix::DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& vi
 		// 線を描画
 		Novice::DrawLine(static_cast<int>(ScreenStart[zIndex].x), static_cast<int>(ScreenStart[zIndex].y),
 			static_cast<int>(ScreenEnd[zIndex].x), static_cast<int>(ScreenEnd[zIndex].y), lineColor);
+	}
+}
+
+//void Matrix::DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color)
+//{
+//	const uint32_t kSubdevision = 10;//分割数
+//	const float kLonEvery = 2.0f * PI / kSubdevision;//経度分割一つ分の角度
+//	const float kLatEvery = PI / kSubdevision;//緯度分割一つ分の角度
+//	//緯度の方向に分割　ーπ/2～π/2
+//	for (uint32_t thetaIndex = 0; thetaIndex < kSubdevision; ++thetaIndex) {
+//		float theta = -PI / 2.0f + kLatEvery * thetaIndex;//現在の緯度
+//		float thetaNext = theta + kLatEvery;
+//		//経度の方向に分割　0～2π
+//		for (uint32_t phiIndex = 0; phiIndex < kSubdevision; ++phiIndex) {
+//			float phi = phiIndex * kLonEvery;//現在の経度
+//			float phiNext = phi + kLonEvery;
+//
+//			//world座標系でのa,b,cを求める
+//			Vector3 a, b, c;
+//
+//			a = {
+//				sphere.center.x + sphere.radius * cos(theta) * cos(phi),
+//				sphere.center.y + sphere.radius * sin(theta),
+//				sphere.center.z + sphere.radius * cos(theta) * sin(phi)
+//			};
+//
+//			b = {
+//				sphere.center.x + sphere.radius * cos(thetaNext) * cos(phi),
+//				sphere.center.y + sphere.radius * sin(thetaNext),
+//				sphere.center.z + sphere.radius * cos(thetaNext) * sin(phi)
+//			};
+//
+//			c = {
+//				sphere.center.x + sphere.radius * cos(theta) * cos(phiNext),
+//				sphere.center.y + sphere.radius * sin(theta),
+//				sphere.center.z + sphere.radius * cos(theta) * sin(phiNext)
+//			};
+//			//a,b,cをScreen座標系まで変換
+//
+//			a = Transform(Transform(a, viewProjectionMatrix), viewportMatrix);
+//			b = Transform(Transform(b, viewProjectionMatrix), viewportMatrix);
+//			c = Transform(Transform(c, viewProjectionMatrix), viewportMatrix);
+//
+//			//ab,bcで線を引く
+//			Novice::DrawLine
+//			(
+//				static_cast<int>(a.x), static_cast<int>(a.y),
+//				static_cast<int>(b.x), static_cast<int>(b.y),
+//				color
+//			);
+//
+//			Novice::DrawLine
+//			(
+//				static_cast<int>(a.x), static_cast<int>(a.y),
+//				static_cast<int>(c.x), static_cast<int>(c.y),
+//				color
+//			);
+//		}
+//	}
+//
+//
+//}
+
+void Matrix::DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color) {
+	float pi = std::numbers::pi_v<float>;
+	color = 0x000000FF;
+	const uint32_t kSubdivision = 12;
+	// 経度分割1つ分の角度
+	const float kLonEvery = pi * 2.0f / float(kSubdivision);
+	// 緯度分割1つ分の角度
+	const float kLatEvery = pi / float(kSubdivision);
+	// 緯度の方向に分割
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		float lat = -pi / 2.0f + kLatEvery * latIndex;
+		// 経度の方向に分割しながら線を描く
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			float lon = lonIndex * kLonEvery;
+			Vector3 a = {
+			  sphere.center.x + sphere.radius * std::cos(lat) * std::cos(lon),
+			  sphere.center.y + sphere.radius * std::sin(lat),
+			  sphere.center.z + sphere.radius * std::cos(lat) * std::sin(lon) };
+			Vector3 b = {
+			  sphere.center.x + sphere.radius * std::cos(lat + kLatEvery) * std::cos(lon),
+			  sphere.center.y + sphere.radius * std::sin(lat + kLatEvery),
+			  sphere.center.z + sphere.radius * std::cos(lat + kLatEvery) * std::sin(lon) };
+			Vector3 c = {
+			  sphere.center.x + sphere.radius * std::cos(lat) * std::cos(lon + kLonEvery),
+			  sphere.center.y + sphere.radius * std::sin(lat),
+			  sphere.center.z + sphere.radius * std::cos(lat) * std::sin(lon + kLonEvery) };
+			// 線を描く
+			Vector3 screenA = Transform(Transform(a, viewProjectionMatrix), viewportMatrix);
+			Vector3 screenB = Transform(Transform(b, viewProjectionMatrix), viewportMatrix);
+			Vector3 screenC = Transform(Transform(c, viewProjectionMatrix), viewportMatrix);
+			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenB.x), int(screenB.y), color);
+			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenC.x), int(screenC.y), color);
+		}
 	}
 }
 

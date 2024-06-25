@@ -2,11 +2,22 @@
 #include <Matrix4x4.h>
 #include <Vector3.h>
 #include <Novice.h>
+#include <cmath>
+#include <numbers>
+#include <imgui.h>
+#define PI 3.14159265358979323846
 
 
 class Matrix
 {
-private:
+public:
+	/// <summary>
+	/// 球
+	/// </summary>
+	struct Sphere {
+		Vector3 center;
+		float radius;
+	};
 
 public:
 
@@ -154,10 +165,15 @@ public:
 	static Vector3 Cross(const Vector3& v1, const Vector3& v2);
 
 	
-
+	/// <summary>
+	/// グリッド線の表示
+	/// </summary>
+	/// <param name="viewProjectionMatrix"></param>
+	/// <param name="viewportMatrix"></param>
 	static void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix);
 
-	static Matrix4x4 Identity();
+	static void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, uint32_t color);
+
 
 };
 
