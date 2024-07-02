@@ -280,7 +280,7 @@ Vector3 Matrix::Transform(const Vector3& vector, const Matrix4x4& matrix)
 	tranceform.y = vector.x * matrix.m[0][1] + vector.y * matrix.m[1][1] + vector.z * matrix.m[2][1] + 1.0f * matrix.m[3][1];
 	tranceform.z = vector.x * matrix.m[0][2] + vector.y * matrix.m[1][2] + vector.z * matrix.m[2][2] + 1.0f * matrix.m[3][2];
 	float w = vector.x * matrix.m[0][3] + vector.y * matrix.m[1][3] + vector.z * matrix.m[2][3] + 1.0f * matrix.m[3][3];
-	assert(w != 0.0f);
+	/*assert(w != 0.0f);*/
 	tranceform.x /= w;
 	tranceform.y /= w;
 	tranceform.z /= w;
@@ -412,10 +412,10 @@ void Matrix::DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& vi
 	uint32_t color = 0xAAAAAAFF; // グリッド線の色(薄い灰色)
 	uint32_t originColor = 0x000000FF; // 原点の色
 
-	Vector3 start[11];
-	Vector3 end[11];
-	Vector3 ScreenStart[11];
-	Vector3 ScreenEnd[11];
+	Vector3 start[11] = { 0,0,0,0,0,0,0,0,0,0,0 };
+	Vector3 end[11] = { 0,0,0,0,0,0,0,0,0,0,0 };
+	Vector3 ScreenStart[11] = { 0,0,0,0,0,0,0,0,0,0,0 };
+	Vector3 ScreenEnd[11] = { 0,0,0,0,0,0,0,0,0,0,0 };
 
 	// 奥から手前への線を順々に引いていく
 	for (uint32_t xIndex = 0; xIndex <= kSubdivision; ++xIndex) {

@@ -15,7 +15,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Matrix matrix;
 
-	Vector3 cameraTranslate{ 0.0f,1.9f,-6.49f };
+	/*Vector3 cameraTranslate{ 0.0f,1.9f,-6.49f };*/
 	Vector3 cameraRotate{ 0.26f,0.0f,0.0f };
 	Vector3 cameraPosition = { 0,2.04f,-5.93f };
 
@@ -25,7 +25,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Matrix4x4 viewportMatrix = Matrix::MakeViewportMatrix(0, 0, float(1280), float(720), 0.0f, 1.0f);
 	Matrix4x4 viewProjectionMatrix = Matrix::Multiply(viewMatrix, projectionMatrix);
 
-	Matrix::Sphere sphere = {0,0,0,0.5f};
+	Matrix::Sphere sphere = { 0,0,0,0.5f };
 	uint32_t color = 0xFFFFFFFF;
 
 	// ウィンドウの×ボタンが押されるまでループ
@@ -41,7 +41,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
+		cameraMatrix = Matrix::MakeAffineMatrix({ 1.0f,1.0f,1.0f },cameraRotate, cameraPosition);
+		viewMatrix = Matrix::Inverse(cameraMatrix);
+		projectionMatrix = Matrix::MakePerspectiveFovMatrix(0.45f, float(1280) / float(720), 0.1f, 100.0f);
+		viewportMatrix = Matrix::MakeViewportMatrix(0, 0, float(1280), float(720), 0.0f, 1.0f);
+		viewProjectionMatrix = Matrix::Multiply(viewMatrix, projectionMatrix);
 
+		//Cameraが動かせない
+		ImGui::Begin("Window");
+		ImGui::DragFloat3("CameraTranslate", &cameraPosition.x, 0.01f);
+		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.01f);
+		ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.01f);
+		ImGui::DragFloat("SphereRadius", &sphere.radius, 0.01f);
+		ImGui::End();
 
 		///
 		/// ↑更新処理ここまで
@@ -54,12 +66,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		matrix.DrawGrid(viewProjectionMatrix, viewportMatrix);
 		matrix.DrawSphere(sphere, viewProjectionMatrix, viewportMatrix, color);
 
-		ImGui::Begin("Window");
-		ImGui::DragFloat3("CameraTranslate", &cameraTranslate.x, 0.01f);
-		ImGui::DragFloat3("CameraRotate"   , &cameraRotate.x,    0.01f);
-		ImGui::DragFloat3("SphereCenter"   , &sphere.center.x,   0.01f);
-		ImGui::DragFloat3("SphereRadius"   , &sphere.radius,     0.01f);
-		ImGui::End();
+
 
 		///
 		/// ↑描画処理ここまで
